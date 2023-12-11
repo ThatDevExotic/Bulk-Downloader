@@ -1,4 +1,7 @@
 # Comprehensive Guide to Effortless Bulk File Downloads from Websites
+
+![Bulk Downloader]([https://example.com/image.jpg](https://raw.githubusercontent.com/iAmDextricity/Bulk-Downloader/main/image.png))
+
 ## Introduction:
 In the digital age, efficiently downloading multiple files from websites can be a time-consuming task. Fortunately, there are streamlined methods available to simplify the process and enhance productivity. In this guide, we'll explore a step-by-step approach to bulk downloading files from various websites. Follow these instructions to save time and effort in managing your downloads seamlessly.
 
