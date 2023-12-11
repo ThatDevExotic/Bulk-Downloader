@@ -8,11 +8,21 @@ from tkinter import ttk
 from concurrent.futures import ThreadPoolExecutor
 from ttkthemes import ThemedStyle
 
-current_version = "1.72"
+current_version = "2.84"
 url = "https://raw.githubusercontent.com/iAmDextricity/Bulk-Downloader/main/version"
 
+# Function to create a requests session
+def create_session():
+    session = requests.Session()
+    adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
 try:
-    response = requests.get(url)
+    # Use the session for fetching the version
+    session = create_session()
+    response = session.get(url)
     response.raise_for_status()
     version = response.text.strip()
     print(f"\n\nLatest Version: {version}\nCurrent Version: {current_version}\n")
@@ -22,8 +32,12 @@ try:
         print("You are currently using the latest version")
 except requests.RequestException as e:
     print("Error fetching version:", e)
+finally:
+    # Close the session to release resources
+    if 'session' in locals():
+        session.close()
 
-DEFAULT_MAX_WORKERS = 10
+DEFAULT_MAX_WORKERS = 1
 DEFAULT_DOWNLOAD_DIR = "./downloads"
 
 print("Created by @Dextricity\nI recommend waiting till all workers are finished you impatient fucking shit.\nI literally threw this together in 10 minutes; Please hesitate to contact me.")
@@ -31,12 +45,16 @@ print("Created by @Dextricity\nI recommend waiting till all workers are finished
 def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
     try:
         os.makedirs(destination_folder, exist_ok=True)
-        response = requests.get(url, stream=True)
+
+        # Use the session for downloading the file
+        session = create_session()
+        response = session.get(url, stream=True)
         response.raise_for_status()
+
         file_name = os.path.join(destination_folder, get_safe_filename(url))
         downloading_file_name = file_name + '.downloading'
         total_size = int(response.headers.get('content-length', 0))
-        block_size = 1024
+        block_size = 8192  # Increase block size for potentially better performance
         with open(downloading_file_name, 'wb') as file, tqdm(
                 total=total_size,
                 unit='iB',
@@ -47,6 +65,7 @@ def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
             for data in response.iter_content(block_size):
                 progress_bar.update(len(data))
                 file.write(data)
+
         os.rename(downloading_file_name, file_name)
         print(f"File downloaded successfully: {file_name}")
 
@@ -56,6 +75,10 @@ def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
             os.remove(downloading_file_name)
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
+    finally:
+        # Close the session to release resources
+        if 'session' in locals():
+            session.close()
 
 def get_safe_filename(url):
     return os.path.basename(urlparse(url).path).replace("%20", " ")
@@ -94,37 +117,45 @@ def on_download_click():
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch content from the URL. Error: {e}")
 
+# GUI
 root = tk.Tk()
 root.title("Web Scraper Downloader")
-root.geometry("620x310")  # Set the window size
+root.geometry("330x320")  # Set the window size
 
 style = ThemedStyle(root)
 style.set_theme("plastik")  # You can try different themes
 
-url_label = ttk.Label(root, text="Enter URL:")
-url_label.pack(pady=10)
+# Create a rounded style for buttons
+style.configure('Rounded.TButton', borderwidth=5, relief="flat", foreground="white", background="#3E3E3E", font=('Helvetica', 10, 'bold'))
 
-url_entry = ttk.Entry(root, width=50)
-url_entry.pack(pady=10)
+frame = ttk.Frame(root, padding="10")
+frame.grid(column=0, row=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
-max_workers_label = ttk.Label(root, text="Max Workers (Files to download at a time):")
-max_workers_label.pack(pady=5)
+url_label = ttk.Label(frame, text="Enter URL:")
+url_label.grid(column=0, row=0, pady=10, sticky=tk.W)
 
-max_workers_entry = ttk.Entry(root, width=10)
+url_entry = ttk.Entry(frame, width=50)
+url_entry.grid(column=0, row=1, pady=10, sticky=tk.W)
+
+max_workers_label = ttk.Label(frame, text="Max Workers (Files to download at a time):")
+max_workers_label.grid(column=0, row=2, pady=5, sticky=tk.W)
+
+max_workers_entry = ttk.Entry(frame, width=10)
 max_workers_entry.insert(0, DEFAULT_MAX_WORKERS)
-max_workers_entry.pack(pady=5)
+max_workers_entry.grid(column=0, row=3, pady=5, sticky=tk.W)
 
-download_dir_label = ttk.Label(root, text="Download Directory:")
-download_dir_label.pack(pady=5)
+download_dir_label = ttk.Label(frame, text="Download Directory:")
+download_dir_label.grid(column=0, row=4, pady=5, sticky=tk.W)
 
-download_dir_entry = ttk.Entry(root, width=50)
+download_dir_entry = ttk.Entry(frame, width=50)
 download_dir_entry.insert(0, DEFAULT_DOWNLOAD_DIR)
-download_dir_entry.pack(pady=5)
+download_dir_entry.grid(column=0, row=5, pady=5, sticky=tk.W)
 
-download_button = ttk.Button(root, text="Download Files", command=on_download_click)
-download_button.pack(pady=20)
+# Use the rounded style for the download button
+download_button = ttk.Button(frame, text="Download Files", command=on_download_click, style='Rounded.TButton')
+download_button.grid(column=0, row=6, pady=20, sticky=tk.W)
 
-status_label = ttk.Label(root, text="")
-status_label.pack()
+status_label = ttk.Label(frame, text="")
+status_label.grid(column=0, row=7, sticky=tk.W)
 
 root.mainloop()
