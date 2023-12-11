@@ -3,7 +3,7 @@
 In the digital age, efficiently downloading multiple files from websites can be a time-consuming task. Fortunately, there are streamlined methods available to simplify the process and enhance productivity. In this guide, we'll explore a step-by-step approach to bulk downloading files from various websites. Follow these instructions to save time and effort in managing your downloads seamlessly.
 
 ## Step 1: Obtain the Bulk Download Tool
-To kickstart your efficient file downloading journey, acquire the powerful Bulk Download Tool by following this [link](https://cdn.discordapp.com/attachments/713369788331720727/1183691411388907630/bulk_download.exe?ex=65894188&is=6576cc88&hm=2fa071a67bd1686b36bcbf3a6cb6eb4c175cedd2bce5894cf8c0be88016d497f&). This tool is designed to streamline the process and optimize your downloading experience.
+To kickstart your efficient file downloading journey, acquire the powerful Bulk Download Tool by following this [link](https://github.com/iAmDextricity/Bulk-Downloader/releases). This tool is designed to streamline the process and optimize your downloading experience.
 
 ## Step 2: Validate Archive.org Repository
 Ensure that the repository link is direct to facilitate a smooth downloading process. An exemplary direct link can be found [here](https://archive.org/download/cylums-nintendo-ds-rom-collection/Cylum%27s%20Nintendo%20DS%20ROM%20Collection/). This step is crucial for seamless integration with the Bulk Download Tool.
