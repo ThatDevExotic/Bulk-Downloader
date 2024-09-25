@@ -14,7 +14,6 @@ import chard
 current_version = "3.0a"
 url = "https://raw.githubusercontent.com/iAmDextricity/Bulk-Downloader/main/version"
 
-# Function to create a requests session
 def create_session():
     session = requests.Session()
     adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100)
@@ -23,7 +22,6 @@ def create_session():
     return session
 
 try:
-    # Use the session for fetching the version
     session = create_session()
     response = session.get(url)
     response.raise_for_status()
@@ -36,7 +34,6 @@ try:
 except requests.RequestException as e:
     print("Error fetching version:", e)
 finally:
-    # Close the session to release resources
     if 'session' in locals():
         session.close()
 
@@ -49,7 +46,6 @@ def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
     try:
         os.makedirs(destination_folder, exist_ok=True)
 
-        # Use the session for downloading the file
         session = create_session()
         response = session.get(url, stream=True)
         response.raise_for_status()
@@ -57,7 +53,7 @@ def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
         file_name = os.path.join(destination_folder, get_safe_filename(url))
         downloading_file_name = file_name + '.downloading'
         total_size = int(response.headers.get('content-length', 0))
-        block_size = 8192  # Increase block size for potentially better performance
+        block_size = 8192 
         with open(downloading_file_name, 'wb') as file, tqdm(
                 total=total_size,
                 unit='iB',
@@ -81,7 +77,6 @@ def download_file(url, destination_folder=DEFAULT_DOWNLOAD_DIR):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
     finally:
-        # Close the session to release resources
         if 'session' in locals():
             session.close()
 
@@ -168,12 +163,11 @@ def on_download_click():
 # GUI
 root = tk.Tk()
 root.title("Web Scraper Downloader")
-root.geometry("330x380")  # Set the window size
+root.geometry("330x380")
 
 style = ThemedStyle(root)
-style.set_theme("plastik")  # You can try different themes
+style.set_theme("plastik")
 
-# Create a rounded style for buttons
 style.configure('Rounded.TButton', borderwidth=5, relief="flat", foreground="white", background="#3E3E3E", font=('Helvetica', 10, 'bold'))
 
 frame = ttk.Frame(root, padding="10")
@@ -199,17 +193,14 @@ download_dir_entry = ttk.Entry(frame, width=50)
 download_dir_entry.insert(0, DEFAULT_DOWNLOAD_DIR)
 download_dir_entry.grid(column=0, row=5, pady=5, sticky=tk.W)
 
-# Checkbutton for extraction option
 extract_var = tk.BooleanVar()
 extract_checkbutton = ttk.Checkbutton(frame, text="Extract Files", variable=extract_var)
 extract_checkbutton.grid(column=0, row=6, pady=5, sticky=tk.W)
 
-# Checkbutton for CHD conversion option
 chd_var = tk.BooleanVar()
 chd_checkbutton = ttk.Checkbutton(frame, text="Convert  iso or bin/cue to CHD", variable=chd_var)
 chd_checkbutton.grid(column=0, row=7, pady=5, sticky=tk.W)
 
-# Use the rounded style for the download button
 download_button = ttk.Button(frame, text="Download Files", command=on_download_click, style='Rounded.TButton')
 download_button.grid(column=0, row=8, pady=20, sticky=tk.W)
 
